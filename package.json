@@ -1,0 +1,16 @@
+{
+  "name": "office-arcade-monorepo",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start": "npm run start --workspaces",
+    "dev": "npm run dev --workspaces"
+  },
+  "devDependencies": {
+    "@prisma/client": "^7.8.0",
+    "prisma": "^7.8.0"
+  }
+}

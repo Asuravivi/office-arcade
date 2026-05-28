@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../arcade.db"
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  passwordHash    String
+  arcadeCoins     Int      @default(0)
+  eloRating       Int      @default(1000)
+  equippedAvatar  String   @default("default")
+  watchlist       String   @default("[]") // JSON string array of symbols
+  isAdmin         Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  friendsRequested Friend[] @relation("UserFriends")
+  friendsReceived  Friend[] @relation("FriendUsers")
+  cosmetics        Cosmetic[]
+  portfolio        Portfolio?
+  positions        Position[]
+  trades           TradeHistory[]
+  userChallenges   UserChallenge[]
+  notifications    Notification[]
+  priceAlerts      PriceAlert[]
+}
+
+model Friend {
+  userId    Int
+  friendId  Int
+  status    String   @default("pending")
+
+  user      User     @relation("UserFriends", fields: [userId], references: [id])
+  friend    User     @relation("FriendUsers", fields: [friendId], references: [id])
+
+  @@id([userId, friendId])
+}
+
+model Cosmetic {
+  userId    Int
+  itemId    String
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@id([userId, itemId])
+}
+
+model HighScore {
+  id        Int      @id @default(autoincrement())
+  game      String
+  nickname  String
+  score     Int
+  createdAt DateTime @default(now())
+}
+
+model Portfolio {
+  userId      Int      @id
+  cashBalance Float    @default(1000000.0) // Starts with ₹10,00,000
+
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Position {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  symbol       String
+  quantity     Int      @default(0)
+  averagePrice Float
+
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, symbol])
+}
+
+model TradeHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  symbol    String
+  type      String   // "BUY" or "SELL"
+  quantity  Int
+  price     Float
+  timestamp DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SystemConfig {
+  key   String @id
+  value String
+}
+
+model DailyChallenge {
+  id          Int      @id @default(autoincrement())
+  description String
+  targetType  String   // e.g. "WIN_UNO", "TRADE_PROFIT", "SCORE_2048"
+  targetValue Int      // e.g. 3 (wins), 500 (profit), 2000 (score)
+  coinReward  Int      // e.g. 500
+  date        DateTime @default(now())
+
+  userChallenges UserChallenge[]
+}
+
+model UserChallenge {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  challengeId    Int
+  progress       Int      @default(0)
+  isCompleted    Boolean  @default(false)
+
+  user           User           @relation(fields: [userId], references: [id])
+  challenge      DailyChallenge @relation(fields: [challengeId], references: [id])
+
+  @@unique([userId, challengeId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model PriceAlert {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  symbol    String
+  target    Float
+  condition String   // "ABOVE" or "BELOW"
+  isTriggered Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}

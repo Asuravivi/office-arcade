@@ -1,0 +1,36 @@
+# ── Node ──────────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+dist/
+build/
+client/dist/
+server/dist/
+
+# ── Environment variables ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+server/.env
+# .env.example is intentionally NOT ignored — it documents required vars
+
+# ── Database ──────────────────────────────────────────────────────────────────
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# ── OS & Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+*.swp
+
+# ── Prisma ────────────────────────────────────────────────────────────────────
+# Keep migration files committed — only ignore generated client
+server/node_modules/.prisma/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+logs/
+*.log
